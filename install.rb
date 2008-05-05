@@ -1,0 +1,1 @@
+FileUtils.mkpath(Letterpress::Config.fonts_dir)
