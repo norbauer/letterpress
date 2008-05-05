@@ -1,13 +1,94 @@
 Letterpress
-==========
+===========
 
 Introduction goes here.
 
 
-Example
-=======
+Prerequisites
+=============
 
-Example goes here.
+ImageMagick (NOT RMagick.  It isn't used)
+
+
+Configuration
+=============
+
+Absolute path to the directory to look for fonts:
+    Letterpress::Config.fonts_dir
+  Default:
+    RAILS_ROOT/lib/fonts
+
+Directory to output images, relative to RAILS_ROOT/public/images ():
+    Letterpress::Config.images_dir
+  Default:
+    letterpress
+
+File format used to render the image (can be anything ImageMagick supports):
+    Letterpress::Config.image_format
+  Default:
+    'png'
+
+
+Usage
+=====
+
+letterpress(text, options = {})
+
+The letterpress method takes two parameters: the text to be rendered as an 
+image and a hash of options.  Supported options are:
+
+  :background_color => The background color, specified in the supported ImageMagick
+    formats enumerated at http://www.imagemagick.org/RMagick/doc/imusage.html#color_names.
+
+  :font => The file name of a font found in the letterpress fonts directory.  Any font
+    supported by ImageMagick will work.  If no extension is provided, .ttf is assumed.
+
+  :color => The color of the text, specified in the supported ImageMagick formats
+    enumerated at http://www.imagemagick.org/RMagick/doc/imusage.html#color_names.
+
+  :size => The size of the text, IN POINTS
+
+  :format => The format of the image that the text will be rendered out to.  This
+    can be set as a plugin-wide setting with Letterpress::Config.image_format, or
+    this can be specified in each call to letterpress.  The default is 'png'.
+
+All unsupported options will be passed on to image_tag as is.  This can be 
+used, for example, to provide the css class of the image:
+
+  <%= letterpress "Le géant américain des logiciels", 
+        :format => 'jpeg',
+        :class => 'some_css_class' %>
+
+
+Examples
+========
+
+In RAILS_ROOT/lib/fonts:
+
+  AppleGothic.ttf
+  
+In a view:
+  
+  <%= letterpress "Hello, sir!", :format => 'gif' %>
+
+ Or...
+
+  <%= letterpress "Some awesome text", 
+        :font => 'AppleGothic', 
+        :size => 55, 
+        :color => '#f7f7f7', 
+        :background_color => 'red',
+        :format => 'png' %>
+
+ Etc.
+
+
+Rake Task
+=========
+
+To clear all previously generated images, run the task provided:
+
+  letterpress:images:clear
 
 
 Copyright (c) 2008 Norbauer Inc, released under the MIT license
