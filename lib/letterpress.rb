@@ -39,17 +39,10 @@ module Letterpress
       end
     end
     
-    # Generate a unique filename for this set of text and options.  There 
-    # needs to be a different filename for the same set of text but different
-    # options, because we will be generating a different file if even just
-    # the colors are different.
-    file_name = Digest::MD5.hexdigest(letterpress_options.to_s) + ".#{letterpress_options[:format]}"
-    output_dir = Config.images_dir
+    text = ImageMagickText.new(Config.images_dir, letterpress_options)
+    text.write_if_necessary
     
-    ImageMagickText.new(output_dir, file_name, letterpress_options).write_if_necessary
-    
-    file_path = File.join(output_dir, file_name)
     options = {:alt => text}.merge(options)
-    image_tag(file_path, options)
+    image_tag(text.relative_image_path, options)
   end
 end 
