@@ -59,6 +59,13 @@ used, for example, to provide the css class of the image:
         :format => 'jpeg',
         :class => 'some_css_class' %>
 
+The generated image will be written out to the directory configured in 
+Letterpress::Config.images_dir (with a filename equal to the md5 hash of the text
+and all the options passed in).  If an image with this filename already exists,
+it will not be generated again (unless you are in development mode).  Add some
+fragment caching and this will perform just as well as pre-generated images and
+image_tag.
+
 
 Examples
 ========
@@ -69,11 +76,11 @@ In RAILS_ROOT/lib/fonts:
   
 In a view:
   
-  <%= letterpress "Hello, sir!", :format => 'gif' %>
+  <%= letterpress "Assertively revolutionize worldwide materials via 2.0 content.", :format => 'gif' %>
 
  Or...
 
-  <%= letterpress "Some awesome text", 
+  <%= letterpress "Compellingly harness client-based ideas whereas business schemas.", 
         :font => 'AppleGothic', 
         :size => 55, 
         :color => '#f7f7f7', 

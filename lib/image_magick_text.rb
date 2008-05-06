@@ -1,65 +1,37 @@
-require 'digest/md5'
 require 'pathname'
 
 class ImageMagickText
-  @@attributes = :body, :background_color, :font, :fill, :size, :format
-  attr_accessor *@@attributes
-    
-  def initialize(body)
-    @body = body
+  def initialize(output_dir, file_name, options)
+    @absolute_image_path = Pathname.new(File.join(Rails.root, 'public', 'images', output_dir, file_name))
+    @options = options
   end
   
-  def to_s
-    @body.to_s
-  end
-  
-  def render(output_dir)
-    if @body.nil?
-      raise RuntimeError.new("Text body must be set before rendering the image")
-    elsif @format.nil?
-      raise RuntimeError.new("Image format must be set before rendering the image")
-    end
-    
-    file_name = generate_filename
-    image_path = Pathname.new(File.join(Rails.root, 'public', 'images', output_dir, file_name))
-    
-    write(image_path) unless image_path.exist?
-    
-    return File.join(output_dir, file_name)
+  def write_if_necessary
+    write if !@absolute_image_path.exist? || Rails.env == 'development'
   end
   
   # ------------------------------ private ------------------------------
   private
   
-  def write(image)    
-    unless image.parent.exist?
-      image.parent.mkpath # like mkdir, but creates intermediate directories
+  def write
+    unless @absolute_image_path.parent.exist?
+      @absolute_image_path.parent.mkpath # like mkdir, but creates intermediate directories
     end
     
-    command = 'convert '
-    command += %Q( -background "#{@background_color}") unless @background_color.nil?
-    command += %Q( -font "#{@font}") unless @font.nil?
-    command += %Q( -fill "#{@fill}") unless @fill.nil?
-    command += %Q( -pointsize #{@size}) unless @size.nil?
-    
-    command += %Q( label:"#{@body}")
-    command += %Q( "#{image}")
+    command = generate_convert_command
 
     Rails.logger.debug("Calling ImageMagick with command: #{command}")
     Kernel.system(command)
   end
   
-  # Generate a unique filename for this set of text and options.  There 
-  # needs to be a different filename for the same set of text but different
-  # options, because we will be generating a different file if even just
-  # the colors are different.
-  def generate_filename
-    string = ''
-    for attribute in @@attributes
-      attr_s = attribute.to_s
-      string += attr_s + instance_variable_get("@#{attr_s}").to_s
-    end
+  def generate_convert_command
+    command = 'convert '
+    command += %Q( -background "#{@options[:background_color]}") if @options[:background_color]
+    command += %Q( -font "#{@options[:font]}") if @options[:font]
+    command += %Q( -fill "#{@options[:fill]}") if @options[:fill]
+    command += %Q( -pointsize #{@options[:size]}) if @options[:size]
     
-    Digest::MD5.hexdigest(string) + ".#{@format.to_s}"
+    command += %Q( label:"#{@options[:body]}")
+    command += %Q( "#{@absolute_image_path}")
   end
 end

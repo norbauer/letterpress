@@ -1,8 +1,4 @@
-if Rails.env == 'development'
-  load 'image_magick_text.rb'
-else
-  require 'image_magick_text'
-end
+require 'digest/md5'
 
 module Letterpress
   module Config
@@ -22,34 +18,38 @@ module Letterpress
   def letterpress(text, options = {})
     options.symbolize_keys!
         
-    text = ImageMagickText.new(text)
-        
+    letterpress_options = {
+      :background_color => options.delete(:background_color),
+      :fill => options.delete(:color),
+      :size => options.delete(:size),
+      :body => text,
+      :format => (options.delete(:format) || Config.image_format).to_s
+    }
+    
+    letterpress_options.reject! { |k,v| v.nil? }
+    
     if font = options.delete(:font)
-      paths = [ File.join(Config.fonts_dir, font),
-                File.join(Config.fonts_dir, font + '.ttf') ]
-      unless path = paths.find { |path| File.exists?(path) }
+      path = File.join(Config.fonts_dir, font)
+      if File.exists?(path)
+        letterpress_options[:font] = path
+      elsif File.exists?(path += '.ttf')
+        letterpress_options[:font] = path
+      else
         raise ArgumentError.new("Invalid font specified: #{font}")
       end
-      text.font = path
     end
     
-    if color = options.delete(:color)
-      text.fill = color
-    end
+    # Generate a unique filename for this set of text and options.  There 
+    # needs to be a different filename for the same set of text but different
+    # options, because we will be generating a different file if even just
+    # the colors are different.
+    file_name = Digest::MD5.hexdigest(letterpress_options.to_s) + ".#{letterpress_options[:format]}"
+    output_dir = Config.images_dir
     
-    if background_color = options.delete(:background_color)
-      text.background_color = background_color
-    end
+    ImageMagickText.new(output_dir, file_name, letterpress_options).write_if_necessary
     
-    if size = options.delete(:size)
-      text.size = size
-    end
-    
-    text.format = options.delete(:format) || Config.image_format
-    
-    file_name = text.render(Config.images_dir)
+    file_path = File.join(output_dir, file_name)
     options = {:alt => text}.merge(options)
-    
-    image_tag(file_name, options)
+    image_tag(file_path, options)
   end
 end 
