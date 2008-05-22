@@ -16,10 +16,12 @@ module Letterpress
   end
   
   def letterpress(text, options = {})
+    options = options.dup
     options.symbolize_keys!
         
     letterpress_options = {
       :background_color => options.delete(:background_color),
+      :transparent => options.delete(:transparent),
       :fill => options.delete(:color),
       :size => options.delete(:size),
       :body => text,
@@ -42,7 +44,7 @@ module Letterpress
     text = ImageMagickText.new(Config.images_dir, letterpress_options)
     text.write_if_necessary
     
-    options = {:alt => text}.merge(options)
+    options = {:alt => letterpress_options[:body]}.merge(options)
     image_tag(text.relative_image_path, options)
   end
 end 

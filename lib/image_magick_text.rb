@@ -39,6 +39,7 @@ class ImageMagickText
     command = 'convert '
     command += %Q( -background "#{@options[:background_color]}") if @options[:background_color]
     command += %Q( -font "#{@options[:font]}") if @options[:font]
+    command += %Q( -transparent "#{@options[:transparent]}") if @options[:transparent]
     command += %Q( -fill "#{@options[:fill]}") if @options[:fill]
     command += %Q( -pointsize #{@options[:size]}) if @options[:size]
     
