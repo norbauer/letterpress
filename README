@@ -52,6 +52,9 @@ image and a hash of options.  Supported options are:
     can be set as a plugin-wide setting with Letterpress::Config.image_format, or
     this can be specified in each call to letterpress.  The default is 'png'.
 
+  :transparent => The color to make transparent within the image. Pass the same
+   color here as in background_color option to make a transparent image for web use.
+
 All unsupported options will be passed on to image_tag as is.  This can be 
 used, for example, to provide the css class of the image:
 
