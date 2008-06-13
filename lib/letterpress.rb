@@ -14,11 +14,11 @@ module Letterpress
     mattr_accessor :image_format
     self.image_format = 'png'
   end
-  
+
   def letterpress(text, options = {})
     options = options.dup
     options.symbolize_keys!
-        
+
     letterpress_options = {
       :background_color => options.delete(:background_color),
       :transparent => options.delete(:transparent),
@@ -27,9 +27,9 @@ module Letterpress
       :body => text,
       :format => (options.delete(:format) || Config.image_format).to_s
     }
-    
+
     letterpress_options.reject! { |k,v| v.nil? }
-    
+
     if font = options.delete(:font)
       path = File.join(Config.fonts_dir, font)
       if File.exists?(path)
@@ -40,11 +40,11 @@ module Letterpress
         raise ArgumentError.new("Invalid font specified: #{font}")
       end
     end
-    
+
     text = ImageMagickText.new(Config.images_dir, letterpress_options)
     text.write_if_necessary
-    
-    options = {:alt => letterpress_options[:body]}.merge(options)
+
+    options = {:alt => letterpress_options[:body], :size => text.size}.merge(options)
     image_tag(text.relative_image_path, options)
   end
-end 
+end

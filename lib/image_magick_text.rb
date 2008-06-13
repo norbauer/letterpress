@@ -7,12 +7,20 @@ class ImageMagickText
     # options, because we will be generating a different file if even just
     # the colors are different.
     @file_name = Digest::MD5.hexdigest(options.to_s) + ".#{options[:format]}"
-    
+
     @output_dir = output_dir
     @absolute_image_path = Pathname.new(File.join(Rails.root, 'public', 'images', @output_dir, @file_name))
     @options = options
   end
-  
+
+  def size
+    return @size
+  end
+
+  def size=(str)
+    @size = str
+  end
+
   def write_if_necessary
     write if !@absolute_image_path.exist? || Rails.env == 'development'
   end
@@ -20,10 +28,10 @@ class ImageMagickText
   def relative_image_path
     File.join(@output_dir, @file_name)
   end
-  
+
   # ------------------------------ private ------------------------------
   private
-  
+
   def write
     unless @absolute_image_path.parent.exist?
       @absolute_image_path.parent.mkpath # like mkdir, but creates intermediate directories
@@ -32,11 +40,11 @@ class ImageMagickText
     command = generate_convert_command
 
     Rails.logger.debug("Calling ImageMagick with command: #{command}")
-    Kernel.system(command)
+    self.size = %x(#{command}).scan(/\d+x\d+/).first
   end
-  
+
   def generate_convert_command
-    command = 'convert '
+    command = 'convert -verbose'
     command += %Q( -background "#{@options[:background_color]}") if @options[:background_color]
     command += %Q( -font "#{@options[:font]}") if @options[:font]
     command += %Q( -transparent "#{@options[:transparent]}") if @options[:transparent]
