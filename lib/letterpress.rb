@@ -24,6 +24,7 @@ module Letterpress
       :transparent => options.delete(:transparent),
       :fill => options.delete(:color),
       :size => options.delete(:size),
+      :density => options.delete(:density),
       :body => text,
       :format => (options.delete(:format) || Config.image_format).to_s
     }
