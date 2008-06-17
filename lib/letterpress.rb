@@ -13,10 +13,16 @@ module Letterpress
     # Default file format used to render the image (can be anything ImageMagick supports)
     mattr_accessor :image_format
     self.image_format = 'png'
+    
+    # pass any other site-wide options through environment or environment/* files
+    mattr_accessor :singleton_options
+    self.singleton_options = {}
+
   end
 
   def letterpress(text, options = {})
     options = options.dup
+    options = options.merge Config::singleton_options
     options.symbolize_keys!
 
     letterpress_options = {
