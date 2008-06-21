@@ -51,6 +51,7 @@ class ImageMagickText
     command += %Q( -fill "#{@options[:fill]}") if @options[:fill]
     command += %Q( -pointsize #{@options[:size]}) if @options[:size]
     command += %Q( -density #{@options[:density]}) if @options[:density]    
+    command += %Q( -units #{@options[:units]}) if @options[:units]
     command += %Q( label:"#{@options[:body]}")
     command += %Q( "#{@absolute_image_path}")
   end

@@ -1,7 +1,7 @@
 Letterpress
 ===========
 
-Introduction goes here.
+Rails plugin, uses Imagemagick to generate images for displaying text in non-web fonts.
 
 
 Prerequisites
@@ -28,6 +28,15 @@ File format used to render the image (can be anything ImageMagick supports):
   Default:
     'png'
 
+A hash of default, site-wide parameters.  The options passed into individual calls to the
+letterpress() method are merged into this, overwriting these defaults:
+    Letterpress::Config.singleton_options
+  Default:
+    {:density => "72", :units => "PixelsPerInch"}
+  Examples:
+    Letterpress::Config.singleton_options[:font] = "Verdana-Regular"
+    Letterpress::Config.singleton_options[:density] = "300"
+    Letterpress::Config.singleton_options.merge!(:density => "100", :size => 20)
 
 Usage
 =====
@@ -53,7 +62,15 @@ image and a hash of options.  Supported options are:
     this can be specified in each call to letterpress.  The default is 'png'.
 
   :transparent => The color to make transparent within the image. Pass the same
-   color here as in background_color option to make a transparent image for web use.
+    color here as in background_color option to make a transparent image for web use.
+
+  :density => The horizontal and vertical resolution in pixels of the image.  Specified
+    as the width ("DD") or width and height ("DDxDD").
+
+  :units => the units of image resolution.  Choose from: Undefined, PixelsPerInch, or
+    PixelsPerCentimeter.
+
+See http://www.imagemagick.org/script/command-line-options.php for more information.
 
 All unsupported options will be passed on to image_tag as is.  This can be 
 used, for example, to provide the css class of the image:

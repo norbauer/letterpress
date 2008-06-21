@@ -16,7 +16,7 @@ module Letterpress
     
     # pass any other site-wide options through environment or environment/* files
     mattr_accessor :singleton_options
-    self.singleton_options = {}
+    self.singleton_options = {:density => "72", :units => "PixelsPerInch"}
 
   end
 
