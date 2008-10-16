@@ -39,9 +39,7 @@ module Letterpress
 
     if font = options.delete(:font)
       path = File.join(Config.fonts_dir, font)
-      if File.exists?(path)
-        letterpress_options[:font] = path
-      elsif File.exists?(path += '.ttf')
+      if path = [path, path+'.ttf', path+'.otf'].detect { |p| p if File.exists?(p) }
         letterpress_options[:font] = path
       else
         raise ArgumentError.new("Invalid font specified: #{font}")
